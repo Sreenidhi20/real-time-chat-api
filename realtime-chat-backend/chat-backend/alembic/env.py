@@ -3,11 +3,14 @@ from sqlalchemy import create_engine, pool
 
 from app.config import DATABASE_URL
 from app.models import message as _message
+from app.models import user as _user
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL.replace("%", "%%"))
 
 target_metadata = _message.Message.metadata
+if _user.User.metadata is not target_metadata:
+	raise RuntimeError("Alembic models must share the same metadata")
 
 
 def run_migrations_offline() -> None:

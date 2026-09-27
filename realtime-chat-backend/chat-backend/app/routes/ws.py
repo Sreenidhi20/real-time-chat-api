@@ -1,16 +1,30 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
-from sqlalchemy.orm import Session
 import json
 
+import jwt
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from sqlalchemy.orm import Session
+
 from app.core.connection_manager import manager
+from app.core.security import decode_access_token
 from app.database import get_db
 from app.services import message_service
 
 router = APIRouter()
 
 
-@router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = Depends(get_db)):
+@router.websocket("/ws")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    token: str,
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        claims = decode_access_token(token)
+        user_id = int(claims["sub"])
+    except (jwt.InvalidTokenError, KeyError, TypeError, ValueError):
+        await websocket.close(code=1008)
+        return
+
     await manager.connect(user_id, websocket)
 
     try:
@@ -21,7 +35,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, db: Session = D
             recipient_id = data["to"]
             content = data["message"]
 
-            # Save FIRST, regardless of whether the recipient is online 
+            # Save first, regardless of whether the recipient is online.
             saved = message_service.save_message(db, sender_id=user_id, receiver_id=recipient_id, content=content)
 
             payload = json.dumps({

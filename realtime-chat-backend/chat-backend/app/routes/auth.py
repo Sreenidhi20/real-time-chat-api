@@ -1,3 +1,5 @@
+from typing import Dict, Union
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -14,7 +16,7 @@ class LoginRequest(BaseModel):
 
 
 @router.post("/login")
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> dict[str, int | str]:
+def login(payload: LoginRequest, db: Session = Depends(get_db)) -> Dict[str, Union[int, str]]:
     username = payload.username.strip()
     if not username:
         raise HTTPException(status_code=400, detail="Username cannot be blank")

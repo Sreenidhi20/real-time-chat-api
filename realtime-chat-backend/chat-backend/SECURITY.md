@@ -85,14 +85,14 @@ Content-Type: application/json
 Example response:
 
 ```json
-{"access_token": "<jwt>", "user_id": 1}
+{ "access_token": "<jwt>", "user_id": 1 }
 ```
 
 Connect from a browser:
 
 ```js
 const ws = new WebSocket(
-  `ws://localhost:8000/ws?token=${encodeURIComponent(accessToken)}`
+  `ws://localhost:8000/ws?token=${encodeURIComponent(accessToken)}`,
 );
 ```
 

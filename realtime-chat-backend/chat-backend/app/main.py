@@ -1,15 +1,11 @@
-from fastapi import Depends, FastAPI, Response
-from sqlalchemy.orm import Session
-
-from app.database import check_db_health, get_db
+from fastapi import FastAPI
+from app.routes import auth, health, messages, presence, users, ws
 
 app = FastAPI(title="Realtime Chat Backend")
 
-@app.get("/health")
-def health_check(response : Response, db: Session = Depends(get_db)):
-    is_alive = check_db_health(db)
-    if is_alive:
-        return {"status": "UP", "database": "CONNECTED"}
-    else:
-        response.status_code = 503
-        return {"status": "DOWN", "database": "DISCONNECTED"}
+app.include_router(ws.router)
+app.include_router(auth.router)
+app.include_router(messages.router)
+app.include_router(presence.router)
+app.include_router(users.router)
+app.include_router(health.router)

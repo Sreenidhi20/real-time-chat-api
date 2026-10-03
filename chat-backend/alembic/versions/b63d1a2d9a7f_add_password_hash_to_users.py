@@ -25,7 +25,6 @@ def upgrade() -> None:
         "users",
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
     )
-    op.alter_column("users", "password_hash", server_default=None)
 
 
 def downgrade() -> None:

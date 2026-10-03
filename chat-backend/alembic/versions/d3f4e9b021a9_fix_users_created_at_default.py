@@ -17,6 +17,11 @@ depends_on = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.name == "sqlite":
+        op.execute("UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL")
+        return
+
     op.execute("UPDATE users SET created_at = NOW() WHERE created_at IS NULL")
     op.alter_column(
         "users",
@@ -28,6 +33,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.name == "sqlite":
+        return
+
     op.alter_column(
         "users",
         "created_at",

@@ -17,4 +17,13 @@ JWT_SECRET = os.getenv("JWT_SECRET")
 if not JWT_SECRET:
 	raise RuntimeError("JWT_SECRET is not configured")
 
+CORS_ORIGINS = [
+	origin.strip()
+	for origin in os.getenv(
+		"CORS_ORIGINS",
+		"http://localhost:3000,http://localhost:5173",
+	).split(",")
+	if origin.strip()
+]
+
 ALGORITHM = "HS256"

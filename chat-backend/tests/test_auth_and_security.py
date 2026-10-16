@@ -79,3 +79,17 @@ def test_users_and_messages_require_authentication():
         headers={"Authorization": f"Bearer {token}"},
     )
     assert messages.status_code == 200
+
+
+def test_register_cors_preflight():
+    response = client.options(
+        "/register",
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
